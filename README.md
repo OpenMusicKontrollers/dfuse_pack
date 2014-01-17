@@ -41,7 +41,7 @@ A minimal working example using all the defaults for omitted arguments:
 	dfuse_pack \
 		-o firmware.dfu \
 			-i image.bin \
-		-a 0 \
+		-a 0
 
 A more complex one based on two images for alternate setting 0 and a single image for alternate setting 1:
 
