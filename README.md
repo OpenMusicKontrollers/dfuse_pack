@@ -1,13 +1,13 @@
 # dfuse\_pack
 
-## A DfuSe packer
+## A DfuSe packer (USB device firmware upgrade STMicroelectronics extension)
 
-This command line utility lets you pack raw binary firmware images into a DfuSe image container to be downloaded by any compatible flasher. The ideal companion to extend your automated build and release infrastructure base of DfuSe containers.
+This command line utility lets you pack raw binary firmware images into a DfuSe image container to be downloaded by any compatible flasher. The ideal companion to extend your automated build and release infrastructure based on DfuSe containers.
 
 ### Dependencies
 
-- eina (from the enlightenment foundation libraries (EFL))
-- cmake (as build tool)
+- [eina](http://docs.enlightenment.org/auto/eina/eina_main.html)
+- [cmake](http://www.cmake.org/)
 
 ### Build / install
 
