@@ -4,6 +4,10 @@
 
 This command line utility lets you pack raw binary firmware images into a DfuSe image container to be downloaded by any compatible flasher. The ideal companion to extend your automated build and release infrastructure based on DfuSe containers.
 
+### Build status
+
+[![Build Status](https://travis-ci.org/OpenMusicKontrollers/dfuse_pack.svg?branch=master)](https://travis-ci.org/OpenMusicKontrollers/dfuse_pack)
+
 ### Dependencies
 
 - [eina](http://docs.enlightenment.org/auto/eina/eina_main.html)
