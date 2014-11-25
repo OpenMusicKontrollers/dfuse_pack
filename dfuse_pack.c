@@ -21,6 +21,8 @@
  *     distribution.
  */
 
+#include <portable_endian.h>
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
