@@ -20,14 +20,18 @@
 
 #include <dfuse_pack.h>
 
-#include <Eina.h>
-
+typedef struct _DfuSe_List					DfuSe_List; 
 typedef struct _DfuSe_Entry					DfuSe_Entry;
 typedef struct _DfuSe_Entry_Image		DfuSe_Entry_Image;
 
+struct _DfuSe_List {
+	DfuSe_List *next;
+	void *data;
+};
+
 struct _DfuSe_Entry {
 	DfuSe_Target_Prefix tPrefix;
-	Eina_List *images;
+	DfuSe_List *images;
 };
 
 struct _DfuSe_Entry_Image {

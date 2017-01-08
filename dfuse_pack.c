@@ -107,11 +107,59 @@ new_image()
 	return image;
 }
 
+#define LIST_FOREACH(LIST, ITERATOR, DATA) \
+	for((ITERATOR) = (LIST), (DATA) = (ITERATOR) ? (ITERATOR)->data : NULL; \
+			(ITERATOR); \
+			(ITERATOR) = (ITERATOR)->next, (DATA) = (ITERATOR) ? (ITERATOR)->data : NULL)
+
+#define LIST_FREE(LIST, HEAD, DATA) \
+	for((HEAD) = (LIST), (DATA) = (LIST) ? (LIST)->data : NULL; \
+			(LIST); \
+			(LIST) = (LIST)->next, (DATA) = (LIST) ? (LIST)->data : NULL, free(HEAD))
+
+DfuSe_List *
+list_append(DfuSe_List *list, void *data)
+{
+	DfuSe_List *next = malloc(sizeof(DfuSe_List));
+	if(next)
+	{
+		next->next = NULL;
+		next->data = data;
+
+		if(list)
+		{
+			DfuSe_List *tail = NULL;
+			for(tail = list; tail->next; tail = tail->next)
+				;
+
+			tail->next = next;
+		}
+		else
+		{
+			list = next;
+		}
+	}
+
+	return list;
+}
+
+size_t
+list_count(DfuSe_List *list)
+{
+	size_t count = 0;
+
+	DfuSe_List *itr = NULL;
+	for(itr = list; itr; itr = itr->next)
+		count++;
+
+	return count;
+}
+
 int
 main (int argc, char **argv)
 {
-	Eina_List *targets = NULL;
-	Eina_List *l, *m;
+	DfuSe_List *targets = NULL;
+	DfuSe_List *l, *m;
 	DfuSe_Entry *entry = NULL;
 	DfuSe_Entry_Image *image = NULL;
 	uint16_t version = 0xffff;
@@ -126,8 +174,6 @@ main (int argc, char **argv)
 	goto cleanup; \
 })
 
-	eina_init();
-
 	int c;
 	while( (c = getopt (argc, argv, "a:i:m:n:f:p:v:o:h")) != -1 )
 		switch(c)
@@ -141,7 +187,7 @@ main (int argc, char **argv)
 				entry->tPrefix.bAlternateSetting = asetting;
 				if(!entry->images)
 					FAIL("at least one image [-i] needed for altsetting %i\n", entry->tPrefix.bAlternateSetting);
-				targets = eina_list_append(targets, entry);
+				targets = list_append(targets, entry);
 				entry = NULL;
 				break;
 			}
@@ -164,7 +210,7 @@ main (int argc, char **argv)
 				entry = entry ? entry : new_entry();
 				image = image ? image : new_image();
 				image->path = strdup(optarg);
-				entry->images = eina_list_append(entry->images, image);
+				entry->images = list_append(entry->images, image);
 				image = NULL;
 				break;
 			case 'f':
@@ -202,11 +248,11 @@ main (int argc, char **argv)
 
 	uint32_t DFUImageSize = DFUSE_TARGET_PREFIX_SIZE;
 
-	EINA_LIST_FOREACH(targets, l, entry)
+	LIST_FOREACH(targets, l, entry)
 	{
 		uint32_t dwTargetSize = 0UL;
 
-		EINA_LIST_FOREACH(entry->images, m, image)
+		LIST_FOREACH(entry->images, m, image)
 		{
 			// load image
 			FILE *raw = NULL;
@@ -227,7 +273,7 @@ main (int argc, char **argv)
 		}
 			
 		// update target image prefix
-		entry->tPrefix.dwNbElements = htole32(eina_list_count(entry->images));
+		entry->tPrefix.dwNbElements = htole32(list_count(entry->images));
 		entry->tPrefix.dwTargetSize = htole32(dwTargetSize);
 
 		DFUImageSize += dwTargetSize;
@@ -237,7 +283,7 @@ main (int argc, char **argv)
 		.szSignature = {'D', 'f', 'u', 'S', 'e'},
 		.bVersion = 0x01,
 		.DFUImageSize = htole32(DFUImageSize),
-		.bTargets = eina_list_count(targets)
+		.bTargets = list_count(targets)
 	};
 
 	DfuSe_Suffix suffix = {
@@ -252,10 +298,10 @@ main (int argc, char **argv)
 
 	uint32_t crc = 0xffffffffUL;
 	crc = crc32_update_no_xor (crc, (uint8_t *)&prefix, DFUSE_PREFIX_SIZE);
-	EINA_LIST_FOREACH(targets, l, entry)
+	LIST_FOREACH(targets, l, entry)
 	{
 		crc = crc32_update_no_xor (crc, (uint8_t *)&entry->tPrefix, DFUSE_TARGET_PREFIX_SIZE);
-		EINA_LIST_FOREACH(entry->images, m, image)
+		LIST_FOREACH(entry->images, m, image)
 		{
 			crc = crc32_update_no_xor (crc, (uint8_t *)&image->element, DFUSE_IMAGE_ELEMENT_SIZE);
 			crc = crc32_update_no_xor (crc, image->buf, image->len);
@@ -271,21 +317,21 @@ main (int argc, char **argv)
 	printf("Firmware version: 0x%04x\n", version);
 	printf("Product ID: 0x%04x\n", product);
 	printf("Vendor ID: 0x%04x\n", vendor);
-	printf("Targets: %i\n", eina_list_count(targets));
+	printf("Targets: %zu\n", list_count(targets));
 	printf("CRC: 0x%04x\n\n", crc);
 
 	if(!(dfuse = fopen(out, "wb")))
 		FAIL("could not open output file '%s'\n", out);
 	fwrite (&prefix, DFUSE_PREFIX_SIZE, 1, dfuse);
-	EINA_LIST_FOREACH(targets, l, entry)
+	LIST_FOREACH(targets, l, entry)
 	{
 		printf("Target\n");
 		printf("\tAltsetting: %i\n", entry->tPrefix.bAlternateSetting);
-		printf("\tImages: %i\n", eina_list_count(entry->images));
+		printf("\tImages: %zu\n", list_count(entry->images));
 		printf("\tName: %s\n\n", entry->tPrefix.szTargetName);
 
 		fwrite (&entry->tPrefix, DFUSE_TARGET_PREFIX_SIZE, 1, dfuse);
-		EINA_LIST_FOREACH(entry->images, m, image)
+		LIST_FOREACH(entry->images, m, image)
 		{
 			printf("\tImage\n");
 			printf("\t\tPath: %s\n", image->path);
@@ -304,10 +350,10 @@ cleanup:
 		fclose(dfuse);
 
 	if(targets)
-		EINA_LIST_FREE(targets, entry)
+		LIST_FREE(targets, l, entry)
 		{
 			if(entry->images)
-				EINA_LIST_FREE(entry->images, image)
+				LIST_FREE(entry->images, m, image)
 				{
 					if(image->path)
 						free(image->path);
@@ -320,8 +366,6 @@ cleanup:
 
 	if(out)
 		free(out);
-
-	eina_shutdown();
 
 	return 0;
 }
