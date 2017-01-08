@@ -6,7 +6,7 @@ This command line utility lets you pack raw binary firmware images into a DfuSe 
 
 ### Build status
 
-[![Build Status](https://travis-ci.org/OpenMusicKontrollers/dfuse_pack.svg?branch=master)](https://travis-ci.org/OpenMusicKontrollers/dfuse_pack)
+[![build status](https://gitlab.com/OpenMusicKontrollers/dfuse_pack/badges/master/build.svg)](https://gitlab.com/OpenMusicKontrollers/dfuse_pack/commits/master)
 
 ### Dependencies
 

@@ -84,8 +84,8 @@ crc32_update_no_xor (uint32_t crc, uint8_t *buf, size_t len)
   return crc;
 }
 
-DfuSe_Entry *
-new_entry()
+static DfuSe_Entry *
+new_entry(void)
 {
 	DfuSe_Entry *entry = calloc(1, sizeof(DfuSe_Entry));
 
@@ -99,8 +99,8 @@ new_entry()
 	return entry;
 }
 
-DfuSe_Entry_Image *
-new_image()
+static DfuSe_Entry_Image *
+new_image(void)
 {
 	DfuSe_Entry_Image *image = calloc(1, sizeof(DfuSe_Entry_Image));
 
@@ -117,7 +117,7 @@ new_image()
 			(LIST); \
 			(LIST) = (LIST)->next, (DATA) = (LIST) ? (LIST)->data : NULL, free(HEAD))
 
-DfuSe_List *
+static DfuSe_List *
 list_append(DfuSe_List *list, void *data)
 {
 	DfuSe_List *next = malloc(sizeof(DfuSe_List));
@@ -143,7 +143,7 @@ list_append(DfuSe_List *list, void *data)
 	return list;
 }
 
-size_t
+static size_t
 list_count(DfuSe_List *list)
 {
 	size_t count = 0;
@@ -186,7 +186,7 @@ main (int argc, char **argv)
 				entry = entry ? entry : new_entry();
 				entry->tPrefix.bAlternateSetting = asetting;
 				if(!entry->images)
-					FAIL("at least one image [-i] needed for altsetting %i\n", entry->tPrefix.bAlternateSetting);
+					FAIL("at least one image [-i] needed for altsetting %"PRIu8"\n", entry->tPrefix.bAlternateSetting);
 				targets = list_append(targets, entry);
 				entry = NULL;
 				break;
@@ -314,11 +314,11 @@ main (int argc, char **argv)
 
 	// write container to file
 	printf("Output container: %s\n", out);
-	printf("Firmware version: 0x%04x\n", version);
-	printf("Product ID: 0x%04x\n", product);
-	printf("Vendor ID: 0x%04x\n", vendor);
-	printf("Targets: %zu\n", list_count(targets));
-	printf("CRC: 0x%04x\n\n", crc);
+	printf("Firmware version: 0x%04"PRIx16"\n", version);
+	printf("Product ID: 0x%04"PRIx16"\n", product);
+	printf("Vendor ID: 0x%04"PRIx16"\n", vendor);
+	printf("Targets: %"PRIuPTR"\n", list_count(targets));
+	printf("CRC: 0x%04"PRIx32"\n\n", crc);
 
 	if(!(dfuse = fopen(out, "wb")))
 		FAIL("could not open output file '%s'\n", out);
@@ -326,8 +326,8 @@ main (int argc, char **argv)
 	LIST_FOREACH(targets, l, entry)
 	{
 		printf("Target\n");
-		printf("\tAltsetting: %i\n", entry->tPrefix.bAlternateSetting);
-		printf("\tImages: %zu\n", list_count(entry->images));
+		printf("\tAltsetting: %"PRIu8"\n", entry->tPrefix.bAlternateSetting);
+		printf("\tImages: %"PRIuPTR"\n", list_count(entry->images));
 		printf("\tName: %s\n\n", entry->tPrefix.szTargetName);
 
 		fwrite (&entry->tPrefix, DFUSE_TARGET_PREFIX_SIZE, 1, dfuse);
@@ -335,8 +335,8 @@ main (int argc, char **argv)
 		{
 			printf("\tImage\n");
 			printf("\t\tPath: %s\n", image->path);
-			printf("\t\tAddress: 0x%08x\n", image->element.dwElementAddress);
-			printf("\t\tSize: %i bytes\n\n", image->len);
+			printf("\t\tAddress: 0x%08"PRIx32"\n", image->element.dwElementAddress);
+			printf("\t\tSize: %"PRIu32" bytes\n\n", image->len);
 
 			fwrite (&image->element, DFUSE_IMAGE_ELEMENT_SIZE, 1, dfuse);
 			fwrite (image->buf, sizeof(uint8_t), image->len, dfuse);
