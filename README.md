@@ -10,7 +10,6 @@ This command line utility lets you pack raw binary firmware images into a DfuSe 
 
 ### Dependencies
 
-- [eina](http://docs.enlightenment.org/auto/eina/eina_main.html)
 - [cmake](http://www.cmake.org/)
 
 ### Build / install
@@ -64,7 +63,7 @@ A more complex one based on two images for alternate setting 0 and a single imag
 
 ### License
 
-Copyright (c) 2015 Hanspeter Portner (dev@open-music-kontrollers.ch)
+Copyright (c) 2015-2016 Hanspeter Portner (dev@open-music-kontrollers.ch)
 
 This is free software: you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0 as published by
