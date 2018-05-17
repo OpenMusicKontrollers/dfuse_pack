@@ -14,11 +14,10 @@ This command line utility lets you pack raw binary firmware images into a DfuSe 
 
 ### Build / install
 
-	mkdir build
+	meson build
 	cd build
-	cmake ..
-	make
-	sudo make install
+	ninja -j4
+	sudo ninja install
 
 ### Arguments
 
