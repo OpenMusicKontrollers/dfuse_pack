@@ -4,8 +4,8 @@ stages:
 
 .variables_template: &variables_definition
   variables:
-    BASE_NAME: "lv2lint"
-    PKG_CONFIG_PATH: "/opt/lv2/lib/pkgconfig:/opt/${CI_BUILD_NAME}/lib/pkgconfig"
+    BASE_NAME: "dfuse_pack"
+    PKG_CONFIG_PATH: "/opt/lv2/lib/pkgconfig:/opt/${CI_BUILD_NAME}/lib/pkgconfig:/usr/lib/${CI_BUILD_NAME}/pkgconfig"
     TOOLCHAIN_FILE: "${CI_PROJECT_DIR}/meson/${CI_BUILD_NAME}"
 
 .common_template: &common_definition
