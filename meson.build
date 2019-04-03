@@ -2,7 +2,7 @@ project('dfuse_pack', 'c', default_options : [
 	'buildtype=release',
 	'warning_level=1',
 	'werror=false',
-	'b_lto=true',
+	'b_lto=false',
 	'c_std=c11'])
 
 version = run_command('cat', 'VERSION').stdout().strip()
