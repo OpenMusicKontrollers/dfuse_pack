@@ -19,7 +19,7 @@ stages:
 .build_template: &build_definition
   <<: *common_definition
   script:
-    - meson --prefix=/ --cross-file "${TOOLCHAIN_FILE}" -Dstatic-build=false build
+    - meson --prefix=/ -Dstatic-build=false build
     - ninja -C build
     - DESTDIR="${CI_PROJECT_DIR}/${BASE_NAME}-$(cat VERSION)/${CI_BUILD_NAME}" ninja -C build install
 
